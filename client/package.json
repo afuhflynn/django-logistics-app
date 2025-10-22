@@ -9,26 +9,35 @@
     "start": "next start"
   },
   "dependencies": {
+    "@mapbox/polyline": "^1.2.1",
     "@radix-ui/react-label": "latest",
     "@radix-ui/react-scroll-area": "latest",
     "@radix-ui/react-slot": "latest",
+    "@tanstack/react-query": "^5.90.5",
     "@vercel/analytics": "latest",
+    "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "latest",
     "react": "^19",
     "react-dom": "^19",
+    "react-leaflet": "^5.0.0",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
-    "tw-animate-css": "latest"
+    "tw-animate-css": "latest",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.15",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "polyline": "link:@types/@mapbox/polyline",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "typescript": "^5"

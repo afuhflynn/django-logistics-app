@@ -1,110 +1,141 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { MapPin, Navigation2, X, Loader2, Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { searchLocation } from "@/app/actions"
-import type { Location } from "@/lib/types"
+import { useState } from "react";
+import { MapPin, Navigation2, X, Loader2, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Location } from "@/lib/types";
+import { useAppStore } from "@/lib/store";
 
-interface LocationSelectorProps {
-  startLocation: Location | null
-  endLocation: Location | null
-  onStartLocationChange: (location: Location | null) => void
-  onEndLocationChange: (location: Location | null) => void
-  onCalculateRoute: () => void
-  onClearRoute: () => void
-  isCalculating: boolean
-  cycleHours: number
-  onCycleHoursChange: (hours: number) => void
-}
+export default function LocationSelector() {
+  const [startQuery, setStartQuery] = useState("");
+  const [pickupQuery, setPickupQuery] = useState("");
+  const [endQuery, setEndQuery] = useState("");
+  const [startSuggestions, setStartSuggestions] = useState<Location[]>([]);
+  const [pickupSuggestion, setPickupSuggestion] = useState<Location[]>([]);
+  const [endSuggestions, setEndSuggestions] = useState<Location[]>([]);
+  const [isSearchingStart, setIsSearchingStart] = useState(false);
+  const [isSearchingPickup, setIsSearchingPickup] = useState(false);
+  const [isSearchingEnd, setIsSearchingEnd] = useState(false);
 
-export default function LocationSelector({
-  startLocation,
-  endLocation,
-  onStartLocationChange,
-  onEndLocationChange,
-  onCalculateRoute,
-  onClearRoute,
-  isCalculating,
-  cycleHours,
-  onCycleHoursChange,
-}: LocationSelectorProps) {
-  const [startQuery, setStartQuery] = useState("")
-  const [endQuery, setEndQuery] = useState("")
-  const [startSuggestions, setStartSuggestions] = useState<Location[]>([])
-  const [endSuggestions, setEndSuggestions] = useState<Location[]>([])
-  const [isSearchingStart, setIsSearchingStart] = useState(false)
-  const [isSearchingEnd, setIsSearchingEnd] = useState(false)
+  const {
+    startLocation,
+    endLocation,
+    cycleHours,
+    setCycleHours,
+    setPickupLocation,
+    setStartLocation,
+    setEndLocation,
+    handleCalculateRoute,
+    isCalculating,
+    handleClearRoute,
+    handleSearch,
+  } = useAppStore();
 
   const handleStartSearch = async (query: string) => {
-    setStartQuery(query)
+    setStartQuery(query);
 
     if (query.length < 3) {
-      setStartSuggestions([])
-      return
+      setStartSuggestions([]);
+      return;
     }
 
-    setIsSearchingStart(true)
+    setIsSearchingStart(true);
     try {
-      const results = await searchLocation(query)
-      setStartSuggestions(results)
+      const data = await handleSearch(query);
+      console.log({ data: data?.locations });
+      setStartSuggestions(data?.locations!);
     } catch (error) {
-      console.error("[v0] Start location search error:", error)
+      console.error("Start location search error:", error);
     } finally {
-      setIsSearchingStart(false)
+      setIsSearchingStart(false);
     }
-  }
+  };
+
+  const handlePickupSearch = async (query: string) => {
+    setPickupQuery(query);
+
+    if (query.length < 3) {
+      setPickupSuggestion([]);
+      return;
+    }
+
+    setIsSearchingPickup(true);
+    try {
+      const data = await handleSearch(query);
+      console.log({ data: data?.locations });
+      setPickupSuggestion(data?.locations!);
+    } catch (error) {
+      console.error("Pickupt location search error:", error);
+    } finally {
+      setIsSearchingPickup(false);
+    }
+  };
 
   const handleEndSearch = async (query: string) => {
-    setEndQuery(query)
+    setEndQuery(query);
 
     if (query.length < 3) {
-      setEndSuggestions([])
-      return
+      setEndSuggestions([]);
+      return;
     }
 
-    setIsSearchingEnd(true)
+    setIsSearchingEnd(true);
     try {
-      const results = await searchLocation(query)
-      setEndSuggestions(results)
+      const data = await handleSearch(query);
+      console.log({ data: data?.locations });
+      setStartSuggestions(data?.locations!);
     } catch (error) {
-      console.error("[v0] End location search error:", error)
+      console.error("End location search error:", error);
     } finally {
-      setIsSearchingEnd(false)
+      setIsSearchingEnd(false);
     }
-  }
+  };
 
   const selectStartLocation = (location: Location) => {
-    onStartLocationChange(location)
-    setStartQuery(location.name)
-    setStartSuggestions([])
-  }
+    setStartLocation(location);
+    setStartQuery(location.name as string);
+    setStartSuggestions([]);
+  };
+
+  const selectPickupLocation = (location: Location) => {
+    setPickupLocation(location);
+    setPickupQuery(location.name as string);
+    setPickupSuggestion([]);
+  };
 
   const selectEndLocation = (location: Location) => {
-    onEndLocationChange(location)
-    setEndQuery(location.name)
-    setEndSuggestions([])
-  }
+    setEndLocation(location);
+    setEndQuery(location.name as string);
+    setEndSuggestions([]);
+  };
 
   const clearStart = () => {
-    onStartLocationChange(null)
-    setStartQuery("")
-    setStartSuggestions([])
-  }
+    setStartLocation(null);
+    setStartQuery("");
+    setStartSuggestions([]);
+  };
 
+  const clearPickup = () => {
+    setPickupLocation(null);
+    setPickupQuery("");
+    setStartSuggestions([]);
+  };
   const clearEnd = () => {
-    onEndLocationChange(null)
-    setEndQuery("")
-    setEndSuggestions([])
-  }
+    setEndLocation(null);
+    setEndQuery("");
+    setEndSuggestions([]);
+  };
 
   return (
     <div className="space-y-4">
       {/* Start Location */}
       <div className="space-y-2">
-        <Label htmlFor="start" className="flex items-center gap-2 text-sm font-medium">
+        <Label
+          htmlFor="start"
+          className="flex items-center gap-2 text-sm font-medium"
+        >
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent">
             <MapPin className="h-4 w-4 text-accent-foreground" />
           </div>
@@ -141,8 +172,14 @@ export default function LocationSelector({
                   onClick={() => selectStartLocation(location)}
                   className="w-full border-b border-border px-4 py-3 text-left text-sm hover:bg-accent last:border-b-0"
                 >
-                  <div className="font-medium text-foreground">{location.name}</div>
-                  {location.address && <div className="text-xs text-muted-foreground">{location.address}</div>}
+                  <div className="font-medium text-foreground">
+                    {location.name}
+                  </div>
+                  {location.address && (
+                    <div className="text-xs text-muted-foreground">
+                      {location.address}
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -152,7 +189,10 @@ export default function LocationSelector({
 
       {/* Pickup Location */}
       <div className="space-y-2">
-        <Label htmlFor="pickup" className="flex items-center gap-2 text-sm font-medium">
+        <Label
+          htmlFor="pickup"
+          className="flex items-center gap-2 text-sm font-medium"
+        >
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500">
             <MapPin className="h-4 w-4 text-white" />
           </div>
@@ -163,34 +203,40 @@ export default function LocationSelector({
             id="pickup"
             type="text"
             placeholder="Enter pickup location..."
-            value={startQuery}
-            onChange={(e) => handleStartSearch(e.target.value)}
+            value={pickupQuery}
+            onChange={(e) => handlePickupSearch(e.target.value)}
             className="pr-8"
           />
-          {startQuery && (
+          {pickupQuery && (
             <button
-              onClick={clearStart}
+              onClick={clearPickup}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </button>
           )}
-          {isSearchingStart && (
+          {isSearchingPickup && (
             <div className="absolute right-2 top-1/2 -translate-y-1/2">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             </div>
           )}
 
-          {startSuggestions.length > 0 && (
+          {pickupSuggestion.length > 0 && (
             <div className="absolute z-10 mt-1 w-full rounded-lg border border-border bg-popover shadow-lg">
-              {startSuggestions.map((location, index) => (
+              {pickupSuggestion.map((location, index) => (
                 <button
                   key={index}
-                  onClick={() => selectStartLocation(location)}
+                  onClick={() => selectPickupLocation(location)}
                   className="w-full border-b border-border px-4 py-3 text-left text-sm hover:bg-accent last:border-b-0"
                 >
-                  <div className="font-medium text-foreground">{location.name}</div>
-                  {location.address && <div className="text-xs text-muted-foreground">{location.address}</div>}
+                  <div className="font-medium text-foreground">
+                    {location.name}
+                  </div>
+                  {location.address && (
+                    <div className="text-xs text-muted-foreground">
+                      {location.address}
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -200,7 +246,10 @@ export default function LocationSelector({
 
       {/* End Location */}
       <div className="space-y-2">
-        <Label htmlFor="end" className="flex items-center gap-2 text-sm font-medium">
+        <Label
+          htmlFor="end"
+          className="flex items-center gap-2 text-sm font-medium"
+        >
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-destructive">
             <Navigation2 className="h-4 w-4 text-destructive-foreground" />
           </div>
@@ -237,8 +286,14 @@ export default function LocationSelector({
                   onClick={() => selectEndLocation(location)}
                   className="w-full border-b border-border px-4 py-3 text-left text-sm hover:bg-accent last:border-b-0"
                 >
-                  <div className="font-medium text-foreground">{location.name}</div>
-                  {location.address && <div className="text-xs text-muted-foreground">{location.address}</div>}
+                  <div className="font-medium text-foreground">
+                    {location.name}
+                  </div>
+                  {location.address && (
+                    <div className="text-xs text-muted-foreground">
+                      {location.address}
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
@@ -248,7 +303,10 @@ export default function LocationSelector({
 
       {/* Cycle Hours */}
       <div className="space-y-2">
-        <Label htmlFor="cycleHours" className="flex items-center gap-2 text-sm font-medium">
+        <Label
+          htmlFor="cycleHours"
+          className="flex items-center gap-2 text-sm font-medium"
+        >
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500">
             <Clock className="h-4 w-4 text-white" />
           </div>
@@ -262,7 +320,9 @@ export default function LocationSelector({
           step="0.5"
           placeholder="Enter hours used in current cycle..."
           value={cycleHours || ""}
-          onChange={(e) => onCycleHoursChange(Number.parseFloat(e.target.value) || 0)}
+          onChange={(e) =>
+            setCycleHours(Number.parseFloat(e.target.value) || 0)
+          }
           className="w-full"
         />
         <p className="text-xs text-muted-foreground">
@@ -273,7 +333,7 @@ export default function LocationSelector({
       {/* Action Buttons */}
       <div className="flex gap-2 pt-2">
         <Button
-          onClick={onCalculateRoute}
+          onClick={handleCalculateRoute}
           disabled={!startLocation || !endLocation || isCalculating}
           className="flex-1"
         >
@@ -289,10 +349,14 @@ export default function LocationSelector({
             </>
           )}
         </Button>
-        <Button onClick={onClearRoute} variant="outline" disabled={!startLocation && !endLocation}>
+        <Button
+          onClick={handleClearRoute}
+          variant="outline"
+          disabled={!startLocation && !endLocation}
+        >
           Clear
         </Button>
       </div>
     </div>
-  )
+  );
 }
