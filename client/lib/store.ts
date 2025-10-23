@@ -1,7 +1,11 @@
 import { create } from "zustand";
 import { ApiRoute, Instruction, Location, RouteData } from "./types";
 import { privateAxios } from "./private-axios";
-import { getInstructionTypeString } from "./helpers";
+import {
+  getInstructionTypeString,
+  transformRouteDataToLogEntries,
+} from "./helpers";
+import { LogEntry } from "./route-calculator";
 
 interface StoreTypes {
   startLocation: Location | null;
@@ -26,9 +30,11 @@ interface StoreTypes {
   handleSearch: (
     query: string
   ) => Promise<{ locations: Location[] } | undefined>;
+  logEntries: LogEntry[];
 }
 
 export const useAppStore = create<StoreTypes>((set, get) => ({
+  logEntries: [],
   startLocation: null,
   setStartLocation(startLocation) {
     set({ startLocation });
@@ -98,6 +104,10 @@ export const useAppStore = create<StoreTypes>((set, get) => ({
       const apiResponse = result.data;
 
       console.log({ apiResponse });
+
+      const logEntries = transformRouteDataToLogEntries(result.data);
+
+      set({ logEntries });
 
       if (
         !apiResponse ||

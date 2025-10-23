@@ -6,6 +6,7 @@ import LocationSelector from "@/components/location-selector";
 import RouteDetails from "@/components/route-details";
 import NavigationPanel from "@/components/navigation-panel";
 import { useAppStore } from "@/lib/store";
+import ELDLogs from "@/components/eld-logs";
 
 export default function RoutePlanningApp() {
   const { error, routeData, isCalculating } = useAppStore();
@@ -20,10 +21,10 @@ export default function RoutePlanningApp() {
               <RouteIcon className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">
+              <h1 className="md:text-xl text-lg  font-bold text-foreground">
                 Logistics Route Planner
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="md:text-sm text-xs text-muted-foreground">
                 Advanced Route Planning with HOS Compliance
               </p>
             </div>
@@ -36,7 +37,7 @@ export default function RoutePlanningApp() {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 w-full h-full md:flex-row overflow-hidden flex-col">
         {/* Left Sidebar - Controls */}
         <aside className="w-full border-r border-border bg-card md:w-96">
           <div className="flex h-full flex-col">
@@ -83,8 +84,9 @@ export default function RoutePlanningApp() {
         </aside>
 
         {/* Right Side - Map */}
-        <main className="flex-1">
+        <main className="flex-1 w-full flex flex-col lg:flex-row">
           <MapView />
+          <ELDLogs />
         </main>
       </div>
     </div>

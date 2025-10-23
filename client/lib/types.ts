@@ -88,6 +88,7 @@ export interface ApiRoute {
   segments: Segment[];
   bbox: [number, number, number, number]; // [minLng, minLat, maxLng, maxLat]
   geometry: Geometry;
+  way_points: number[];
 }
 
 export type NavigationInstruction = Step;
