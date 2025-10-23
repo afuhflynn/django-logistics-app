@@ -26,12 +26,14 @@ CLIENT_URL = os.getenv("CLIENT_URL")
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-9t)i11!#68rr8=mt-821)$5#^c1q25obm*+v-joj)1!pxlu++7"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+VERCEL_HOST = os.getenv("VERCEL_HOST")
+APP_HOST = os.getenv("APP_HOST")
+ALLOWED_HOSTS = [APP_HOST]
 
 
 # Application definition
